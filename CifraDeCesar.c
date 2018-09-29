@@ -5,7 +5,7 @@ int main(void){
   system("cls");
   char sentence[100];
 
-  printf(" Digite a frase para ser codificada: ");
+  printf(" Enter a sentense to be coded: ");
   scanf(" %[^\n]s",sentence);
 
   strlwr(sentence);
