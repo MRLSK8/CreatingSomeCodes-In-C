@@ -23,16 +23,16 @@ int main(void){
              strcpy(password, " " );
              i = 0;
         }else  if(letter == 13){        // 13 = enter
-               if(i < 6 || i > 10){
-  	 system("cls");
-                   printf("\n -_-  Your password must be between 6 to 10 characters in length \a -_-\n");
-                   printf("\n Password: ");
-                   strcpy(password," ");
-                   i = 0;
-               }else{
-	 password[i] = '\0';
-                   break;
-               }
+             if(i < 6 || i > 10){
+  	          system("cls");
+                  printf("\n -_-  Your password must be between 6 to 10 characters in length \a -_-\n");
+                  printf("\n Password: ");
+                  strcpy(password," ");
+                  i = 0;
+	     }else{
+	          password[i] = '\0';
+                  break;
+             }
         }else if(letter == 32){         // 32 = space
              system("cls");
              printf("\n -_-  You can't use space in your password! \a -_-\n");
@@ -40,19 +40,19 @@ int main(void){
              strcpy(password," "); 
              i = 0;
           
-       }else if(letter != '\b' ){     // \b = backspace
-            password[i] = letter;
-            i++;
-            printf("*");
-       }else{
-           system("cls");
-           printf("\n Password: ");
-           for(a = 1; a < i; a++){
+        }else if(letter != '\b' ){     // \b = backspace
+             password[i] = letter;
+             i++;
+             printf("*");
+        }else{
+            system("cls");
+            printf("\n Password: ");
+            for(a = 1; a < i; a++){
                 printf("*");
-           }
-           password[i-1] = ' ';
-           i--;
-       }
+            }
+            password[i-1] = ' ';
+            i--;
+        }
    }
 
    // printf("\n Your password = %s\n", password);
