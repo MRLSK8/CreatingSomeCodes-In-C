@@ -3,401 +3,74 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <conio.h>
+#include <windows.h>
+#include <ctype.h>
+
 struct dates{
  int day;
  int month;
  int year;
 };
 struct access{
-  char name[40], username[20];
+  char name[40], username[20], MarriedWith[40];
   char password[30], confirm_password[30];
-  char city[20], state[20], states_abbr[5]; //Abbr = abbreviation
-  char gender[10], MarriedWith[40];
-  int marital_status, security_code[3];
+  char city[20], state[20], states_abbr[5]; // abbr = abbreviation
+  int marital_status, security_code[3], gender;
   struct dates birthday;
 };
+// Function prototypes
+void Creat_account(struct access people[], int *j);
+void Change_info(struct access people[], int *j);
+void Logging_in(struct access people[], int *j);
+void save_user(struct access people[], int *j);
+void state_abbreviation(char x[],int *z);
+void gets_password(char password[]);
+void Loading(void);
+int Menu(int option);
+
+// Enumeration
+enum{Creat = 1, Enter, Change, Clean, Exit};
+
 int main(void){
  system("cls");
- struct access people[100]; // Struct declaration
- void state_abbreviation(char x[],int *z); // Function declaration
- srand(time(NULL)); 
- // All variables used
+ srand(time(NULL));
+
+ // Struct declaration
+ struct access *people = (struct access *)calloc(1, sizeof(struct access));
+
+ // All variables used in main function
  char log_username[30],log_password[30];
- char current_password[30];
- int test_state_exist = 0, j = 0;
- int code, i, k, p, option, w = 0;
- int check_security_code[3];
- int Option_changes, code_changes;
- 
-  do{ 
-    printf("\n  ------------- MENU --------------- \n");
-    printf("\n 1- Create an account\n 2- I already have an account (enter now) \n 3- Change information \n 4- Clean the screen\n 5- Exit\n --> ");
-    scanf("%i",&option);
+ int i, j = 0, test_state_exist = 0, option;
+
+  do{
+    option = Menu(option);
     switch(option){
-      case 1:
-        system("cls");
-        printf("\n ***** Creating an accont *****\n");
-        printf("\n Enter your name and surname: ");
-        scanf(" %[^\n]s",people[j].name);
-        while(true){
-          printf(" Enter your username: ");
-          scanf(" %[^\n]s",people[j].username);
-          p = 0;
-          //Checking if the username already exists
-          for(i = 0; i < j; i++){
-            if(strcmp(people[j].username,people[i].username) == 0){
-              p++;
-            }
-          }
-          if(p != 0){
-            printf("\n --> *This username already exist, try a different one...\n\n\a");
-          }else{
-           break;
-          }
-        }
-        while(true){
-          printf(" Creat a password: ");
-          scanf(" %[^\n]s",people[j].password);
-          printf(" Confirm your password: ");
-          scanf(" %[^\n]s",people[j].confirm_password);
-          if(strcmp(people[j].password,people[j].confirm_password) == 0){
-            break;
-          }else{
-            printf("\n --> The passwords don't match. Please re-enter a password again <--\n\n\a");
-          }
-        }
-        while(true){
-          printf("\n Gender:\n 1- Female\n 2- Male\n --> ");
-          scanf(" %[^\n]s",people[j].gender);
-          if(strcmp(people[j].gender,"1") == 0 || strcmp(people[j].gender,"2") == 0){
-            break;
-          }else
-            printf("\n --> Invalid option. Please try again... <--\n\a");
-        }
-        while(true){
-          printf("\n Marital status: \n");
-          printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n --> ");
-          scanf("%i",&people[j].marital_status);
-          if(people[j].marital_status == 1 || people[j].marital_status == 2 || people[j].marital_status == 3 ||
-          people[j].marital_status == 4 || people[j].marital_status == 5)
-            break;
-          else
-            printf("\n --> Invalid option. Please try again... <--\n\n\a");
-        }
-        if(people[j].marital_status == 2){
-          printf(" With: ");
-          scanf(" %[^\n]s",people[j].MarriedWith);
-        }
-        printf("\n Living in:");
-        printf("\n City: ");
-        scanf(" %[^\n]s",people[j].city);
-        while(true){
-          test_state_exist = 0;
-          printf(" State: ");
-          scanf(" %[^\n]s",people[j].state);
-          printf(" Abbreviation: ");
-          state_abbreviation(people[j].state,&test_state_exist); // Calling the function to get the abbreviation
-          if(test_state_exist == 0)
-            break;
-          else
-            printf(" *Not found*");
-            printf("\n ---> Brazil has no state with this name, please try gain.... <---\n\a");
-        }
-        printf("\n\n Birthday: \n");
-        while(true){
-          fflush(stdin);
-          printf(" Day: ");
-          scanf(" %i",&people[j].birthday.day);
-          if(people[j].birthday.day > 0 && people[j].birthday.day <= 31)
-           break;
-          else
-           printf("\n *The day you entered is incorrect \n\n\a");
-        }
-        while(true){
-          fflush(stdin);
-          printf(" Month: ");
-          scanf(" %i",&people[j].birthday.month);
-          if(people[j].birthday.month > 0 && people[j].birthday.month <= 12)
-           break;
-          else
-           printf("\n *The month you entered is incorrect \n\n\a"); 
-        }
-        while(true){
-          fflush(stdin);
-          printf(" year: ");
-          scanf(" %i",&people[j].birthday.year);
-          if(people[j].birthday.year > 1900 && people[j].birthday.year <= 2018)
-           break;
-          else
-           printf("\n *There's no way you were born this year\n\n\a");   
-        }
-        printf("\n ---------------------------------------------------------------------------------------------------------------- ");
-        printf("\n #Your account has been successfully created!\n");
-        printf(" #This is your code: --> %i <--\n",j + 1);
-        printf(" \"With this code, you'll be able not only to enter your account, but also to change any of its information later\"\n");
-        printf(" #Your security code: --> ");
-        for(i = 0; i < 3; i++){
-         people[j].security_code[i] = rand() % 10;
-        }
-        for(i = 0; i < 3; i++){
-          printf("%i",people[j].security_code[i]);
-        }
-        printf(" <-- \n \"In case you forget your password, you'll need this code in order to change it\"\n");
-        printf(" ---------------------------------------------------------------------------------------------------------------- \n\n\n\n\n");
-  
-        j++;
-        break;
-      case 2:
-        system("cls");
-        printf("\n\t ________logging in________ \n");
-        printf("\n >> Enter '0' to go back to Menu <<\n");
-        while(true){
-          printf("\n Enter your code: ");
-          scanf("%i",&code);
-          if(code > 0 && code <= j || code == 0)
-           break;
-          else 
-           printf("\n *This code doesn't exist!!!\n\a");
-        }
-        if(code == 0){
-         system("cls");
-         break;
-        }
-        printf("\n >> Enter \"return\" to go back to Menu <<\n\n");
-        while(true){
-          fflush(stdin);
-          printf(" Enter your username: ");
-          scanf(" %[^\n]s",log_username);
-          k = 0;
-          for(i = 0; i <= j; i++){
-            if(strcmp(log_username,people[i].username) == 0 || stricmp(log_username,"return") == 0 ){
-              k++;
-            }
-          }
-          if(k == 0){
-           printf("\n *This username doesn't exist!!!\n\n\a");
-          }else
-           break;
-        }
-        if(stricmp(log_username,"return") == 0){
+       // Case to creat an account
+       case Creat:
+          people = (struct access *)realloc(people, (j+2) * sizeof(struct access)); // Memory allocation
+          Creat_account(people, &j);       // j is the amount of people who have created an account
+          break;
+       // Case to log in your account
+       case Enter:
+          Logging_in(people, &j);
+          break;
+       // Case which changes information
+       case Change:
+          Change_info(people, &j);
+          break;
+       case Clean:
           system("cls");
           break;
-        }
-        while(true){
-          printf(" Enter your password: ");
-          scanf(" %[^\n]s",log_password);
-          // Showing user information (logged in)
-          if(strcmp(people[code - 1].username,log_username) == 0 && strcmp(people[code-1].password,log_password) == 0){
-            system("cls");
-            printf("\n -------------------------------------\n");
-            printf("\n| User name: %s (%s) \n",people[code-1].name,people[code-1].username);
-            printf("| Age: %i", 2018-people[code-1].birthday.year);
-            if(people[code-1].birthday.day < 10 && people[code-1].birthday.month < 10){
-              printf(" (0%i/0%i/%i) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
-            }else if (people[code-1].birthday.day < 10 && people[code-1].birthday.month > 10){
-              printf(" (0%i/%i/%i) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
-            }else if(people[code-1].birthday.day > 10 && people[code-1].birthday.month < 10){
-              printf(" (%i/0%i/%i) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
-            }else{
-              printf(" (%i/%i/%i) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
-            }
-
-            printf("| Marital status: ");
-            if(people[code - 1].marital_status == 1)
-              printf("Single\n");
-            else if(people[code - 1].marital_status == 2)
-              printf("Married with %s\n",people[code - 1].MarriedWith);
-            else if(people[code - 1].marital_status == 3)
-              printf("Separated\n");
-            else if(people[code - 1].marital_status == 4)
-              printf("Divorced\n");
-            else
-              printf("Widowed\n");
-              
-            printf("| City: %s - ",people[code-1].city);
-            state_abbreviation(people[code-1].state,&test_state_exist); // Calling the function to get the abbreviation
-
-            if(strcmp(people[code-1].gender,"1") == 0){
-             printf("\n| Gender: Female \n");
-             printf("\n -------------------------------------\n\n\n\n");
-            }else{
-             printf("\n| Gender: Male \n");
-             printf("\n -------------------------------------\n\n\n\n");
-            }
-            break;
-          }else if(stricmp(log_password,"return") == 0){
-            system("cls"); 
-            break;
-          }else if(stricmp(log_password,"forgot") == 0){
-            // Changing password due to forgetfulness
-            while(true){
-              w=0;
-              printf("\n Enter your security code:\n");
-              for(i = 0; i < 3; i++){
-               printf(" Number %i: ", i+1);
-               scanf("%i",&check_security_code[i]);
-              }
-              for(i = 0; i < 3; i++){
-                if(people[code-1].security_code[i] != check_security_code[i]){
-                  w++;
-                }
-              }
-              if(w == 0)
-               break;
-              else 
-               printf("\n --> Wrong security code... <--\n\a"); 
-            }
-            while(true){
-              printf("\n Enter your new password: ");
-              scanf(" %[^\n]s",people[code - 1].password);
-              printf(" Confirm your new password: ");
-              scanf(" %[^\n]s",people[code - 1].confirm_password);
-              if(strcmp(people[code - 1].password,people[code - 1].confirm_password) == 0){
-               printf("\n  ||Your password has been successfully changed||\n\n");
-               break;
-              }else
-               printf("\n --> Passwords don't match. Please re-enter a new password again <--\a");
-              printf("\n");
-            }
-
-          }else{
-            printf("\n * The password you entered is incorrect!!!");
-            printf("\n * Forgot your password? Enter \"forgot\" and change it right way!\n\n\a");
-          }
-        }
-
-        break;
-      // Case that changes information
-      case 3:
-        while(true){
-          printf("\n Enter your code, so that you can change your information: ");
-          scanf("%i",&code_changes);
-          if(code_changes > 0 && code_changes <= j)
-           break;
-          else
-            printf("\n *This code doesn't exist!!!\n\a");   
-        }
-        system("cls");
-        do{
-          printf("\n ============= Changing information =================\n");
-          printf("\n What do you want to change? \n");
-          printf(" 1- Name\n 2- Password\n 3- City/State\n 4- Marital status\n 5- Birthday\n 6- Username\n 7- Exit\n --> ");
-          scanf("%i",&Option_changes);
-          
-          switch(Option_changes){
-            case 1:
-              printf("\n Enter your new name and surname: ");
-              scanf(" %[^\n]s",people[code_changes - 1].name);
-              printf(" ### Your name has been successfully changed ###\n");
-              break;
-            case 2:
-              while(true){
-                printf(" Enter your current password: ");
-                scanf(" %[^\n]s",current_password);
-                if(strcmp(current_password,people[code_changes - 1].password) == 0)
-                 break;
-                else
-                 printf("\n *This is not your password, please enter your correct password!\n\n\a");
-              }
-              printf("\n Enter your new password: ");
-              scanf(" %[^\n]s",people[code_changes - 1].password);
-              printf(" ### Your password has been successfully changed ###\n");
-              break;
-            case 3:
-              printf("\n Enter your new:\n");
-              printf(" City: ");
-              scanf(" %[^\n]s",people[code_changes -1].city);
-              while(true){
-                test_state_exist = 0;
-                printf(" State: ");
-                scanf(" %[^\n]s",people[code_changes - 1].state);
-                printf(" Abbreviation: ");
-                state_abbreviation(people[code_changes - 1].state,&test_state_exist); // Calling the function to get the abbreviation
-                if(test_state_exist == 0)
-                  break;
-                else
-                  printf(" *Not found*");
-                  printf("\n ---> Brazil has no state with this name, please try gain.... <---\n\a");
-              }
-              printf("\n ### Your city/state has been successfully changed ###\n\n");
-              break;
-            case 4:
-              while(true){
-                printf("\n Enter your new marital status: \n");
-                printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n --> ");
-                scanf("%i", &people[code_changes - 1].marital_status);
-                if(people[code_changes - 1].marital_status == 1 || people[code_changes - 1].marital_status == 2 ||
-                people[code_changes - 1].marital_status == 3 || people[code_changes - 1].marital_status == 4 || people[code_changes - 1].marital_status == 5)
-                 break;
-                else
-                 printf("\n --> Invalid option. Please try again... <--\n\n\a");
-              }
-              if(people[code_changes - 1].marital_status == 2){
-                printf(" With: ");
-                scanf(" %[^\n]s",people[code_changes - 1].MarriedWith);
-              }
-              printf("\n ### Your marital status has been successfully changed ###\n\n");
-              break;
-            case 5:
-              printf("\n Enter your new birthday: \n");
-              while(true){
-                fflush(stdin);
-                printf(" Day: ");
-                scanf(" %i",&people[code_changes - 1].birthday.day);
-                if(people[code_changes - 1].birthday.day > 0 && people[code_changes - 1].birthday.day <= 31)
-                break;
-                else
-                printf("\n *The day you entered is incorrect \n\n\a");
-              }
-              while(true){
-                fflush(stdin);
-                printf(" Month: ");
-                scanf(" %i",&people[code_changes - 1].birthday.month);
-                if(people[code_changes - 1].birthday.month > 0 && people[code_changes - 1].birthday.month <= 12)
-                break;
-                else
-                printf("\n *The month you entered is incorrect \n\n\a"); 
-              }
-              while(true){
-                fflush(stdin);
-                printf(" year: ");
-                scanf(" %i",&people[code_changes - 1].birthday.year);
-                if(people[code_changes - 1].birthday.year > 1900 && people[code_changes - 1].birthday.year <= 2018)
-                break;
-                else
-                printf("\n *There's no way you were born this year\n\n\a");   
-              }
-              printf("\n ### Your birthday has been successfully changed ###\n\n");
-              break;
-            case 6:
-              printf("\n Enter your new username: ");
-              scanf(" %[^\n]s",people[code_changes - 1].username);
-              printf("\n ### Your username has been successfully changed ###\n\n");
-              break;
-            case 7:
-              system("cls");
-              break;
-            default:
-              printf("\n --> Invalid option. Please try again... <--\n\a");
-              break;
-          }
-        }while(Option_changes != 7);
-
-        break;
-      case 4:
-        system("cls");
-
-        break;
-      case 5:
-        printf("\n Finishing...\n");
-
-        break;
-      default:
-        printf("\n --> Invalid option. Please try again... <--\n\a");
+       case Exit:
+          printf("\n Finishing...\n");
+          break;
+       default:
+          printf("\n -_- Invalid option. Please try again... -_-\n\a");
+          break;
     }
-
   }while(option != 5);
-
+  getch();
   return 0;
 }
 void state_abbreviation(char x[],int *z){
@@ -459,8 +132,503 @@ void state_abbreviation(char x[],int *z){
    strcpy(abbreviation,"TO");
   }else
     *z = 1;
-    
   if(*z == 0){
-   printf("%s",abbreviation);
+    printf("%s", abbreviation);
   }
 }
+void save_user(struct access people[], int *j){
+  FILE *pointer = fopen("UsersData.txt", "a");
+
+  fprintf(pointer, "Name: %s\n",people[*j].name);
+  fprintf(pointer, "State: %s\n", people[*j].state);
+  fprintf(pointer, "City: %s\n", people[*j].city);
+  if(people[*j].gender == 1){
+    fprintf(pointer, "Gender: Female \n");
+  }else{
+    fprintf(pointer, "Gender: Male \n");
+  }
+
+  fprintf(pointer,"Marital status: ");
+  if(people[*j].marital_status== 1)
+   fprintf(pointer,"Single\n");
+  else if(people[*j].marital_status == 2)
+   fprintf(pointer, "Married\n");
+  else if(people[*j].marital_status == 3)
+   fprintf(pointer, "Separated\n");
+  else if(people[*j].marital_status == 4)
+   fprintf(pointer, "Divorced\n");
+  else if(people[*j].marital_status == 5)
+   fprintf(pointer, "Widowed\n");
+  else
+   fprintf(pointer, "Dating\n");
+
+  fprintf(pointer, "Birthday: %0.2d / %0.2d / %0.2d\n\n",people[*j].birthday.day,people[*j].birthday.month,people[*j].birthday.year);
+  fclose(pointer);
+}
+void gets_password(char password[]){
+   char letter;
+   int i = 0, a;
+
+   printf(" Rules:\n 1- Password must be between 6 to 10 characters in length;\n");
+   printf(" 2- Password can not have any space;\n 3- Password must be alphanumeric (only letters and numbers);\n");
+
+   printf("\n Password: ");
+   while(true){
+        letter = getch();        // gets the letter
+
+        if(letter != 13 && letter != '\b' && letter != 32 &&  isalnum(letter) == 0){
+              system("cls");
+              printf("\n -_-  Your password must be alphanumeric (only letters and numbers); \a -_-\n");
+              printf("\n Password: ");
+              strcpy(password, " " );
+              i = 0;
+        }else  if(letter == 13){        // 13 = enter
+               if(i < 6 || i > 10){
+                   system("cls");
+                   printf("\n -_-  Your password must be between 6 to 10 characters in length \a -_-\n");
+                   printf("\n Password: ");
+                   strcpy(password," ");
+                   i = 0;
+               }else{
+                   password[i] = '\0';
+                   break;
+               }
+        }else if(letter == 32){         // 32 = space
+              system("cls");
+              printf("\n -_-  You can't use space in your password! \a -_-\n");
+              printf("\n Password: ");
+              strcpy(password," ");
+              i = 0;
+
+        }else if(letter != '\b' ){     // \b = backspace
+              password[i] = letter;
+              i++;
+              printf("*");
+        }else{
+             system("cls");
+             printf("\n Password: ");
+             for(a = 1; a < i; a++){
+                printf("*");
+             }
+             password[i-1] = ' ';
+             i--;
+        }
+   }
+}
+void Loading(void){
+  int i;
+  printf("\n\n Loading, please wait...\n ");
+  for(i = 0; i < 20; i++){
+     printf("\xDB");
+     Sleep(600);
+  }
+  system("cls");
+}
+void Creat_account(struct access people[], int *j){
+   int i, p, test_state_exist = 0;
+
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n Enter your name and surname: ");
+    scanf(" %[^\n]s",people[*j].name);
+    // Getting the username
+    while(true){
+       printf(" Enter your username: ");
+       scanf(" %[^\n]s",people[*j].username);
+       p = 0;
+       //Checking if the username already exists
+       for(i = 0; i < *j; i++){
+         if(strcmp(people[*j].username,people[i].username) == 0){
+           p++;
+           break;
+         }
+       }
+       if(p != 0){
+          printf("\n -_- *This username already exist, try a different one... -_-\n\n\a");
+       }else
+          break;
+     }
+     system("cls");
+     printf("\n ***** Creating an account *****\n\n");
+     while(true){
+        printf(" Creat a password: \n\n");
+        gets_password(people[*j].password); // Function to get the password.
+        printf("\n\n #Confirm your password: \n\n");
+        gets_password(people[*j].confirm_password); // Function to get the password(confirmation).
+        if(strcmp(people[*j].password,people[*j].confirm_password) == 0){
+          break;
+        }else{
+          printf("\n\n -_- The passwords don't match. Please re-enter a password again -_-\n\n\a");
+        }
+     }
+     system("cls");
+     printf("\n ***** Creating an account *****\n\n");
+     while(true){
+        printf("\n Gender:\n 1- Female\n 2- Male\n --> ");
+        scanf("%d", &people[*j].gender);
+        if(people[*j].gender == 1 || people[*j].gender == 2){
+           break;
+        }else
+           printf("\n -_- Invalid option. Please try again... -_-\n\a");
+     }
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    while(true){
+      printf("\n Marital status: \n");
+      printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n 6- Dating\n --> ");
+      scanf("%d",&people[*j].marital_status);
+      if(people[*j].marital_status == 1 || people[*j].marital_status == 2 || people[*j].marital_status == 3 ||
+      people[*j].marital_status == 4 || people[*j].marital_status == 5 || people[*j].marital_status == 6)
+        break;
+      else
+        printf("\n -_- Invalid option. Please try again... -_-\n\n\a");
+    }
+    if(people[*j].marital_status == 2){
+      printf(" Married to: ");
+      scanf(" %[^\n]s",people[*j].MarriedWith);
+    }
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n Living in:");
+    printf("\n City: ");
+    scanf(" %[^\n]s",people[*j].city);
+    while(true){
+      test_state_exist = 0;
+      printf(" State: ");
+      scanf(" %[^\n]s",people[*j].state);
+      state_abbreviation(people[*j].state, &test_state_exist);
+      if(test_state_exist == 0)
+        break;
+      else{
+        printf(" *Not found*");
+        printf("\n -_- Brazil has no state with this name, please try gain.... -_-\n\a");
+      }
+    }
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n\n Birthday: \n");
+    while(true){
+      fflush(stdin);
+      printf(" Day: ");
+      scanf(" %d",&people[*j].birthday.day);
+      if(people[*j].birthday.day > 0 && people[*j].birthday.day <= 31)
+       break;
+      else
+       printf("\n -_- *The day you entered is incorrect. -_-\n\n\a");
+    }
+    while(true){
+      fflush(stdin);
+      printf(" Month: ");
+      scanf(" %d",&people[*j].birthday.month);
+      if(people[*j].birthday.month > 0 && people[*j].birthday.month <= 12)
+        break;
+      else
+        printf("\n -_- *The month you entered is incorrect. -_-\n\n\a");
+    }
+    while(true){
+      fflush(stdin);
+      printf(" year: ");
+      scanf(" %d",&people[*j].birthday.year);
+      if(people[*j].birthday.year > 1900 && people[*j].birthday.year <= 2018)
+        break;
+      else
+        printf("\n -_- *There's no way you were born this year. -_-\n\n\a");
+    }
+    system("cls");
+    printf("\n ---------------------------------------------------------------------------------------------------------------- ");
+    printf("\n #Your account has been successfully created!\n\n");
+    printf(" #This is your code: ---> %i <---\n",*j + 1);
+    printf(" \"With this code, you'll be able not only to enter your account, but also to change any of its information later\"\n\n");
+    printf(" #Your security code: ---> ");
+    for(i = 0; i < 3; i++){
+     people[*j].security_code[i] = rand() % 10;
+    }
+    for(i = 0; i < 3; i++){
+      if(i != 2){
+        printf("%d, ",people[*j].security_code[i]);
+      }else
+        printf("%d",people[*j].security_code[i]);
+    }
+    printf(" <--- \n \"In case you forget your password, you'll need this code in order to change it\"\n");
+    printf(" ---------------------------------------------------------------------------------------------------------------- \n\n\n");
+
+    // Saving user's data
+    save_user(people, j);  // Here "j" is equal to "&j"
+
+    *j = *j + 1;
+}
+void Logging_in(struct access people[], int *j){
+   system("cls");
+   char log_username[30], log_password[30];
+   int code, k, w,i, test_state_exist = 0, check_security_code[3];
+
+    printf("\n\t _____________logging in_____________ \n");
+    printf("\n >> Enter '0' to go back to Menu <<\n");
+    while(true){
+      printf("\n Enter your code: ");
+      scanf("%i",&code);
+      if(code >= 0 && code <= *j)
+        break;
+      else
+        printf("\n -_- *This code doesn't exist!!! -_-\n\a");
+    }
+    // Get out of the function
+    if(code == 0){
+      system("cls");
+      return;
+    }
+    printf("\n >> Enter \"return\" to go back to Menu <<\n\n");
+    while(true){
+      fflush(stdin);
+      printf(" Enter your username: ");
+      scanf(" %[^\n]s",log_username);
+      k = 0;
+      for(i = 0; i <= *j; i++){
+        if(strcmp(log_username,people[i].username) == 0 || stricmp(log_username,"return") == 0 ){
+          k++;
+          break;
+        }
+      }
+      if(k == 0){
+       printf("\n -_- *This username doesn't exist!!! -_-\n\n\a");
+      }else
+       break;
+    }
+    if(stricmp(log_username,"return") == 0){
+      system("cls");
+      return;
+    }
+    while(true){
+      printf(" Enter your password:\n (Enter \"forgot\" if you've forgotten your password!)\n\n");
+      gets_password(log_password);
+      // Showing user information (logged in)
+      if(strcmp(people[code - 1].username,log_username) == 0 && strcmp(people[code-1].password,log_password) == 0){
+        Loading();
+        system("cls");
+        printf("\n -------------------------------------\n");
+        printf("\n| User name: %s (%s) \n",people[code-1].name,people[code-1].username);
+        printf("| Age: %i", 2018-people[code-1].birthday.year);
+        printf(" (%0.2d/%0.2d/%d) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
+
+        printf("| Marital status: ");
+        if(people[code - 1].marital_status == 1)
+          printf("Single\n");
+        else if(people[code - 1].marital_status == 2)
+          printf("Married to %s\n",people[code - 1].MarriedWith);
+        else if(people[code - 1].marital_status == 3)
+          printf("Separated\n");
+        else if(people[code - 1].marital_status == 4)
+          printf("Divorced\n");
+        else if(people[code - 1].marital_status == 4)
+          printf("Widowed\n");
+        else
+          printf("Dating\n");
+
+        printf("| City: %s - ",people[code-1].city);
+        state_abbreviation(people[code-1].state,&test_state_exist); // Calling the function to get the abbreviation
+
+        if(people[code-1].gender == 1){
+          printf("\n| Gender: Female \n");
+          printf("\n -------------------------------------\n\n\n");
+        }else{
+          printf("\n| Gender: Male \n");
+          printf("\n -------------------------------------\n\n\n");
+        }
+        break;
+      }else if(stricmp(log_password,"return") == 0){
+        system("cls");
+        break;
+      }else if(stricmp(log_password,"forgot") == 0){
+         // Changing password due to forgetfulness
+         while(true){
+           w = 0;
+           printf("\n\n Enter your security code:\n");
+           for(i = 0; i < 3; i++){
+             printf(" Number %i: ", i+1);
+             scanf("%i",&check_security_code[i]);
+           }
+           for(i = 0; i < 3; i++){
+             if(people[code-1].security_code[i] != check_security_code[i]){
+               w++;
+               break;
+             }
+           }
+           if(w == 0)
+             break;
+           else
+             printf("\n -_- Wrong security code... -_-\n\a");
+         }
+         system("cls");
+         while(true){
+           printf("\n Enter your new password: \n\n");
+           gets_password(people[code - 1].password);
+           printf("\n Confirm your new password: \n\n");
+           gets_password(people[code - 1].confirm_password);
+           if(strcmp(people[code - 1].password,people[code - 1].confirm_password) == 0){
+             printf("\n\n #### Your password has been successfully changed ####\n\n\n\n");
+             break;
+           }else
+             printf("\n -_- Passwords don't match. Please re-enter a new password again -_-\a");
+          }
+
+      }else{
+        printf("\n\n\n -_- The password you entered is incorrect!\n -_- Forgot your password? Enter \"forgot\" and change it right way!\n\n\n\a");
+      }
+    }
+}
+int Menu(int option){
+  int i;
+
+  for(i = 0; i < 15; i++){
+    printf("%c ",220);
+  }
+  printf("\n%c\t    MENU \t    %c\n%c\t\t\t    %c", 220, 220, 220,220);
+  printf("\n%c 1- Create an new account  %c\n%c 2- Login to your account  %c\n", 220,220,220,220);
+  printf("%c 3- Change information\t    %c\n%c 4- Clean the screen\t    %c\n%c 5- Exit\t\t    %c ",220,220,220,220,220,220,220);
+
+  printf("\n");
+  for(i = 0; i < 15; i++){
+    printf("%c ",220);
+  }
+  printf("\nOption: ");
+  scanf("%i",&option);
+  return option;
+}
+void Change_info(struct access people[], int *j){
+  int code_changes, Option_changes, test_state_exist = 0;
+  char current_password[20];
+
+  printf("\n >> Enter '0' to go back to Menu <<\n");
+  while(true){
+      printf("\n Enter your code, so that you can change your information: ");
+      scanf("%d",&code_changes);
+      if(code_changes >= 0 && code_changes <= *j)
+       break;
+      else
+        printf("\n -_-  This code doesn't exist!!! -_-\n\a");
+  }
+  // Get out of the function
+  if(code_changes == 0){
+    system("cls");
+    return;
+  }
+  do{
+    printf("\n ============= Changing information =================\n");
+    printf("\n What do you want to change? \n");
+    printf(" 1- Name\n 2- Password\n 3- City/State\n 4- Marital status\n 5- Birthday\n 6- Username\n 7- Exit\n --> ");
+    scanf("%d",&Option_changes);
+    system("cls");
+    switch(Option_changes){
+       case 1:
+           printf("\n Enter your new name and surname: ");
+           scanf(" %[^\n]s",people[code_changes - 1].name);
+           printf(" ### Your name has been successfully changed ###\n");
+           break;
+       case 2:
+           while(true){
+           printf("\n Enter your current password: \n\n");
+           gets_password(current_password);
+           if(strcmp(current_password,people[code_changes - 1].password) == 0)
+              break;
+           else
+              printf("\n\n -_- *This is not your password, please enter your correct password! -_-\n\n\a");
+           }
+           printf("\n\n Enter your new password: \n\n");
+           gets_password(people[code_changes - 1].password);
+           printf("\n\n\n ##### Your password has been successfully changed #####\n\n");
+           break;
+       case 3:
+           printf("\n Enter your new:\n");
+           printf(" City: ");
+           scanf(" %[^\n]s",people[code_changes -1].city);
+           while(true){
+               test_state_exist = 0;
+               printf(" State: ");
+               scanf(" %[^\n]s",people[code_changes - 1].state);
+               state_abbreviation(people[code_changes - 1].state, &test_state_exist);
+               if(test_state_exist == 0)
+                   break;
+               else
+                   printf(" *Not found*");
+                   printf("\n -_- Brazil has no state with this name, please try gain.... -_-\n\a");
+           }
+           system("cls");
+           printf("\n ### Your city/state has been successfully changed ###\n\n");
+           break;
+        case 4:
+           while(true){
+              printf("\n Enter your new marital status: \n");
+              printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n 6- Dating\n --> ");
+              scanf("%i", &people[code_changes - 1].marital_status);
+              if(people[code_changes - 1].marital_status == 1 || people[code_changes - 1].marital_status == 2 ||
+                 people[code_changes - 1].marital_status == 3 || people[code_changes - 1].marital_status == 4 ||
+                 people[code_changes - 1].marital_status == 5 || people[code_changes - 1].marital_status == 6)
+                 break;
+              else
+                 printf("\n\n -_- Invalid option. Please try again... -_-\n\n\a");
+           }
+           if(people[code_changes - 1].marital_status == 2){
+              printf(" Married to: ");
+              scanf(" %[^\n]s",people[code_changes - 1].MarriedWith);
+           }
+           printf("\n\n ### Your marital status has been successfully changed ###\n\n");
+           break;
+        case 5:
+           printf("\n Enter your new birthday: \n");
+           while(true){
+              fflush(stdin);
+              printf(" Day: ");
+              scanf(" %d",&people[code_changes - 1].birthday.day);
+              if(people[code_changes - 1].birthday.day > 0 && people[code_changes - 1].birthday.day <= 31)
+                 break;
+              else
+                 printf("\n -_- The day you entered is incorrect -_-\n\n\a");
+           }
+           while(true){
+              fflush(stdin);
+              printf(" Month: ");
+              scanf(" %d",&people[code_changes - 1].birthday.month);
+              if(people[code_changes - 1].birthday.month > 0 && people[code_changes - 1].birthday.month <= 12)
+                 break;
+              else
+                 printf("\n -_- The month you entered is incorrect -_-\n\n\a");
+           }
+           while(true){
+              fflush(stdin);
+              printf(" year: ");
+              scanf(" %d",&people[code_changes - 1].birthday.year);
+              if(people[code_changes - 1].birthday.year > 1900 && people[code_changes - 1].birthday.year <= 2018)
+                 break;
+              else
+                 printf("\n -_- There's no way you were born this year -_-\n\n\a");
+           }
+           printf("\n\n ### Your birthday has been successfully changed ###\n\n");
+           break;
+        case 6:
+           printf("\n Enter your new username: ");
+           scanf(" %[^\n]s",people[code_changes - 1].username);
+           printf("\n\n ### Your username has been successfully changed ###\n\n");
+           break;
+        case 7:
+           system("cls");
+           break;
+        default:
+           printf("\n -_- Invalid option. Please try again... -_-\n\a");
+           break;
+      }
+    }while(Option_changes != 7);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
