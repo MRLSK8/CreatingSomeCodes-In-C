@@ -13,10 +13,11 @@ struct dates{
  int year;
 };
 struct access{
-  char name[40], username[20], MarriedWith[40];
+  char name[40], username[20];
   char password[30], confirm_password[30];
   char city[20], state[20], states_abbr[5]; // abbr = abbreviation
-  int marital_status, security_code[3], gender;
+  char gender[10],marital_status[15];
+  int security_code[3], cod;
   struct dates birthday;
 };
 // Function prototypes
@@ -24,6 +25,7 @@ void Creat_account(struct access people[], int *j);
 void Change_info(struct access people[], int *j);
 void Logging_in(struct access people[], int *j);
 void save_user(struct access people[], int *j);
+void readInfo(struct access people[], int *j);
 void state_abbreviation(char x[],int *z);
 void gets_password(char password[]);
 void Loading(void);
@@ -43,6 +45,8 @@ int main(void){
  char log_username[30],log_password[30];
  int i, j = 0, test_state_exist = 0, option;
 
+  readInfo(people, &j);
+  printf("\n *j = %d\n", j);
   do{
     option = Menu(option);
     switch(option){
@@ -137,33 +141,17 @@ void state_abbreviation(char x[],int *z){
   }
 }
 void save_user(struct access people[], int *j){
-  FILE *pointer = fopen("UsersData.txt", "a");
+  FILE *arq;
+  arq = fopen("UsersData.txt", "ab");
 
-  fprintf(pointer, "Name: %s\n",people[*j].name);
-  fprintf(pointer, "State: %s\n", people[*j].state);
-  fprintf(pointer, "City: %s\n", people[*j].city);
-  if(people[*j].gender == 1){
-    fprintf(pointer, "Gender: Female \n");
-  }else{
-    fprintf(pointer, "Gender: Male \n");
+  if(arq == NULL){
+    printf("\n -_- Error opening file! -_-\n");
+    system("pause");
+    exit(true);
   }
+  fwrite(&people[*j], sizeof(struct access), 1, arq);
 
-  fprintf(pointer,"Marital status: ");
-  if(people[*j].marital_status== 1)
-   fprintf(pointer,"Single\n");
-  else if(people[*j].marital_status == 2)
-   fprintf(pointer, "Married\n");
-  else if(people[*j].marital_status == 3)
-   fprintf(pointer, "Separated\n");
-  else if(people[*j].marital_status == 4)
-   fprintf(pointer, "Divorced\n");
-  else if(people[*j].marital_status == 5)
-   fprintf(pointer, "Widowed\n");
-  else
-   fprintf(pointer, "Dating\n");
-
-  fprintf(pointer, "Birthday: %0.2d / %0.2d / %0.2d\n\n",people[*j].birthday.day,people[*j].birthday.month,people[*j].birthday.year);
-  fclose(pointer);
+  fclose(arq);
 }
 void gets_password(char password[]){
    char letter;
@@ -226,11 +214,14 @@ void Loading(void){
 }
 void Creat_account(struct access people[], int *j){
    int i, p, test_state_exist = 0;
+   int auxGender, auxMaritual_status;
+   char auxMarriedWith[20];
 
     system("cls");
     printf("\n ***** Creating an account *****\n\n");
     printf("\n Enter your name and surname: ");
     scanf(" %[^\n]s",people[*j].name);
+
     // Getting the username
     while(true){
        printf(" Enter your username: ");
@@ -265,28 +256,49 @@ void Creat_account(struct access people[], int *j){
      printf("\n ***** Creating an account *****\n\n");
      while(true){
         printf("\n Gender:\n 1- Female\n 2- Male\n --> ");
-        scanf("%d", &people[*j].gender);
-        if(people[*j].gender == 1 || people[*j].gender == 2){
+        scanf("%d",&auxGender);
+        if(auxGender == 1 || auxGender == 2){
            break;
         }else
            printf("\n -_- Invalid option. Please try again... -_-\n\a");
      }
+     // Saving the gender in the variable as string
+     if(auxGender == 1){
+        strcpy(people[*j].gender, "Female");
+     }else{
+        strcpy(people[*j].gender, "Male");
+     }
+
     system("cls");
     printf("\n ***** Creating an account *****\n\n");
     while(true){
       printf("\n Marital status: \n");
       printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n 6- Dating\n --> ");
-      scanf("%d",&people[*j].marital_status);
-      if(people[*j].marital_status == 1 || people[*j].marital_status == 2 || people[*j].marital_status == 3 ||
-      people[*j].marital_status == 4 || people[*j].marital_status == 5 || people[*j].marital_status == 6)
+      scanf("%d",&auxMaritual_status);
+      if(auxMaritual_status == 1 || auxMaritual_status == 2 || auxMaritual_status == 3 ||
+      auxMaritual_status == 4 || auxMaritual_status == 5 || auxMaritual_status == 6)
         break;
       else
         printf("\n -_- Invalid option. Please try again... -_-\n\n\a");
     }
-    if(people[*j].marital_status == 2){
-      printf(" Married to: ");
-      scanf(" %[^\n]s",people[*j].MarriedWith);
+    // Saving the relationship status in the variable as string
+    if(auxMaritual_status == 1){
+        strcpy(people[*j].marital_status, "Single");
+    }else if(auxMaritual_status == 2){
+        printf(" Married to: ");
+        scanf(" %[^\n]s",auxMarriedWith);
+        strcpy(people[*j].marital_status, "Married to ");
+        strcat(people[*j].marital_status, auxMarriedWith);
+    }else if(auxMaritual_status == 3){
+        strcpy(people[*j].marital_status, "Separated");
+    }else if(auxMaritual_status == 4){
+        strcpy(people[*j].marital_status, "Divorced");
+    }else if(auxMaritual_status == 5){
+        strcpy(people[*j].marital_status, "Widowed");
+    }else if(auxMaritual_status == 6){
+        strcpy(people[*j].marital_status, "Dating");
     }
+
     system("cls");
     printf("\n ***** Creating an account *****\n\n");
     printf("\n Living in:");
@@ -352,6 +364,8 @@ void Creat_account(struct access people[], int *j){
     printf(" <--- \n \"In case you forget your password, you'll need this code in order to change it\"\n");
     printf(" ---------------------------------------------------------------------------------------------------------------- \n\n\n");
 
+    people[*j].cod = *j; // Saving user's cod
+
     // Saving user's data
     save_user(people, j);  // Here "j" is equal to "&j"
 
@@ -409,31 +423,12 @@ void Logging_in(struct access people[], int *j){
         printf("\n| User name: %s (%s) \n",people[code-1].name,people[code-1].username);
         printf("| Age: %i", 2018-people[code-1].birthday.year);
         printf(" (%0.2d/%0.2d/%d) \n",people[code-1].birthday.day,people[code-1].birthday.month,people[code-1].birthday.year);
-
-        printf("| Marital status: ");
-        if(people[code - 1].marital_status == 1)
-          printf("Single\n");
-        else if(people[code - 1].marital_status == 2)
-          printf("Married to %s\n",people[code - 1].MarriedWith);
-        else if(people[code - 1].marital_status == 3)
-          printf("Separated\n");
-        else if(people[code - 1].marital_status == 4)
-          printf("Divorced\n");
-        else if(people[code - 1].marital_status == 4)
-          printf("Widowed\n");
-        else
-          printf("Dating\n");
-
+        printf("| Marital status: %s\n", people[code-1].marital_status);
         printf("| City: %s - ",people[code-1].city);
         state_abbreviation(people[code-1].state,&test_state_exist); // Calling the function to get the abbreviation
+        printf("\n| Gender: %s\n", people[code-1].gender);
+        printf("\n -------------------------------------\n\n\n");
 
-        if(people[code-1].gender == 1){
-          printf("\n| Gender: Female \n");
-          printf("\n -------------------------------------\n\n\n");
-        }else{
-          printf("\n| Gender: Male \n");
-          printf("\n -------------------------------------\n\n\n");
-        }
         break;
       }else if(stricmp(log_password,"return") == 0){
         system("cls");
@@ -496,6 +491,8 @@ int Menu(int option){
 }
 void Change_info(struct access people[], int *j){
   int code_changes, Option_changes, test_state_exist = 0;
+  int auxMarital_status, auxGender;
+  char auxMarriedWith[20];
   char current_password[20];
 
   printf("\n >> Enter '0' to go back to Menu <<\n");
@@ -559,18 +556,31 @@ void Change_info(struct access people[], int *j){
            while(true){
               printf("\n Enter your new marital status: \n");
               printf(" 1- Single\n 2- Married\n 3- Separated\n 4- Divorced\n 5- Widowed\n 6- Dating\n --> ");
-              scanf("%i", &people[code_changes - 1].marital_status);
-              if(people[code_changes - 1].marital_status == 1 || people[code_changes - 1].marital_status == 2 ||
-                 people[code_changes - 1].marital_status == 3 || people[code_changes - 1].marital_status == 4 ||
-                 people[code_changes - 1].marital_status == 5 || people[code_changes - 1].marital_status == 6)
+              scanf("%i", &auxMarital_status);
+              if(auxMarital_status == 1 || auxMarital_status == 2 ||
+                 auxMarital_status == 3 || auxMarital_status == 4 ||
+                 auxMarital_status == 5 || auxMarital_status == 6)
                  break;
               else
                  printf("\n\n -_- Invalid option. Please try again... -_-\n\n\a");
            }
-           if(people[code_changes - 1].marital_status == 2){
-              printf(" Married to: ");
-              scanf(" %[^\n]s",people[code_changes - 1].MarriedWith);
-           }
+            if(auxMarital_status == 1){
+                strcpy(people[code_changes - 1].marital_status, "Single");
+            }else if(auxMarital_status == 2){
+                printf(" Married to: ");
+                scanf(" %[^\n]s",auxMarriedWith);
+                strcpy(people[code_changes - 1].marital_status, "Married to ");
+                strcat(people[code_changes - 1].marital_status, auxMarriedWith);
+            }else if(auxMarital_status == 3){
+                strcpy(people[code_changes - 1].marital_status, "Separated");
+            }else if(auxMarital_status == 4){
+                strcpy(people[code_changes - 1].marital_status, "Divorced");
+            }else if(auxMarital_status == 5){
+                strcpy(people[code_changes - 1].marital_status, "Widowed");
+            }else if(auxMarital_status == 6){
+                strcpy(people[code_changes - 1].marital_status, "Dating");
+            }
+
            printf("\n\n ### Your marital status has been successfully changed ###\n\n");
            break;
         case 5:
@@ -618,8 +628,23 @@ void Change_info(struct access people[], int *j){
       }
     }while(Option_changes != 7);
 }
+void readInfo(struct access people[], int *j){
+   int x;
+   FILE *arq;
+   arq = fopen("UsersData.txt", "rb");
 
+   if(arq == NULL){
+    printf("\n -_- Error opening file! -_-\n");
+    system("pause");
+    exit(true);
+  }
+  rewind(arq);
 
+  fread(people, sizeof(struct access),2, arq);
+
+  *j = 2;
+  fclose(arq);
+}
 
 
 
