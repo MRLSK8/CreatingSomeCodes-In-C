@@ -38,15 +38,15 @@ int main(void){
  system("cls");
  srand(time(NULL));
 
- // Struct declaration
- struct access *people = (struct access *)calloc(1, sizeof(struct access));
-
  // All variables used in main function
  char log_username[30],log_password[30];
  int i, j = 0, test_state_exist = 0, option;
 
-  readInfo(people, &j);
-  printf("\n *j = %d\n", j);
+ // Struct declaration
+ struct access *people = (struct access *)calloc(1, sizeof(struct access));
+
+  readInfo(people, &j); // Read all user's info
+
   do{
     option = Menu(option);
     switch(option){
@@ -142,7 +142,7 @@ void state_abbreviation(char x[],int *z){
 }
 void save_user(struct access people[], int *j){
   FILE *arq;
-  arq = fopen("UsersData.txt", "ab");
+  arq = fopen("UsersData.bin", "ab");
 
   if(arq == NULL){
     printf("\n -_- Error opening file! -_-\n");
@@ -208,7 +208,7 @@ void Loading(void){
   printf("\n\n Loading, please wait...\n ");
   for(i = 0; i < 20; i++){
      printf("\xDB");
-     Sleep(600);
+     Sleep(500);
   }
   system("cls");
 }
@@ -369,7 +369,7 @@ void Creat_account(struct access people[], int *j){
     // Saving user's data
     save_user(people, j);  // Here "j" is equal to "&j"
 
-    *j = *j + 1;
+    (*j)++;
 }
 void Logging_in(struct access people[], int *j){
    system("cls");
@@ -629,20 +629,17 @@ void Change_info(struct access people[], int *j){
     }while(Option_changes != 7);
 }
 void readInfo(struct access people[], int *j){
-   int x;
    FILE *arq;
-   arq = fopen("UsersData.txt", "rb");
+   arq = fopen("UsersData.bin", "rb");
 
-   if(arq == NULL){
-    printf("\n -_- Error opening file! -_-\n");
-    system("pause");
-    exit(true);
-  }
-  rewind(arq);
+   if(arq != NULL){
+      while(true){
+         size_t count = fread(&people[*j], sizeof(struct access),1, arq);
+         if(count != 1)break;
+         (*j)++;
+      }
+   }
 
-  fread(people, sizeof(struct access),2, arq);
-
-  *j = 2;
   fclose(arq);
 }
 
