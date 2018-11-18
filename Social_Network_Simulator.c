@@ -29,7 +29,6 @@ void Creat_account(struct access people[], int *j);
 void Change_info(struct access people[], int *j);
 void Logging_in(struct access people[], int *j);
 void save_user(struct access people[], int *j);
-void readInfo(struct access people[], int *j);
 void saveALL(struct access people[], int *j);
 void showALL(struct access people[], int *j);
 void state_abbreviation(char x[],int *z);
@@ -47,12 +46,27 @@ int main(void){
 
  // All variables used in main function
  char log_username[30],log_password[30];
- int i, j = 0, test_state_exist = 0, option;
+ int i, j = 0, test_state_exist = 0, option, aux;
 
  // Initial memory allocation
- struct access *people = (struct access *)calloc(100, sizeof(struct access));
+ struct access *people = (struct access *)calloc(1, sizeof(struct access));
 
- readInfo(people, &j); // Read all user's info
+  // Read all user's info
+   FILE *arq;
+   arq = fopen("UsersData.txt", "rb");
+   size_t count;
+
+   if(arq != NULL){
+      while(true){
+         count = fread(&people[j], sizeof(struct access),1, arq);
+         if(count == 1){
+           people = (struct access *)realloc(people, (j+2) * sizeof(struct access)); // Reallocating memory
+           j++;
+         }
+         if(count != 1)break;
+      }
+     fclose(arq);
+   }
 
   do{
     option = Menu();
@@ -82,7 +96,7 @@ int main(void){
           break;
        // Case to exit the program
        case Exit:
-          printf("\n  Finishing...\n");
+          printf("\n\n  Finishing...\n");
           break;
        default:
           printf("\n -_- Invalid option. Please try again... -_-\n\a");
@@ -521,20 +535,6 @@ void save_user(struct access people[], int *j){
     exit(true);
   }
   fwrite(&people[*j], sizeof(struct access), 1, arq);
-
-  fclose(arq);
-}
-void readInfo(struct access people[], int *j){
-   FILE *arq;
-   arq = fopen("UsersData.txt", "rb");
-
-   if(arq != NULL){
-      while(true){
-         size_t count = fread(&people[*j], sizeof(struct access),1, arq);
-         if(count != 1)break;
-         (*j)++;
-      }
-   }
 
   fclose(arq);
 }
