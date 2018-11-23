@@ -16,10 +16,10 @@ struct dates{
  int day;
 };
 struct access{
+  int security_code[3], cod, position, Age;
   char city[20], state[20], states_abbr[5]; // abbr = abbreviation
   char password[30], confirm_password[30];
-  int security_code[3], cod, position;
-  char gender[10],marital_status[30];
+  char gender[10], marital_status[30];
   char name[40], username[30];
   struct dates birthday;
 };
@@ -28,6 +28,8 @@ struct access{
 void Change_info(struct access people[], int *total_on, int *total_registered);
 void Logging_in(struct access people[], int *total_on, int *total_registered);
 void deletes(struct access people[], int *total_on, int *total_registered);
+int compareByName(const void *compare1, const void *compare2);
+int compareByAge(const void *compare1, const void *compare2);
 void save_user(struct access people[], int *num_cod);
 void saveALL(struct access people[], int *total_on);
 void showALL(struct access people[], int *total_on);
@@ -38,6 +40,7 @@ void gets_password(char password[]);
 void gotoxy(int x, int y);
 void Loading(void);
 int Menu(void);
+
 
 // Enumeration
 enum{Creat = 1, LogInto, Change_Info, Delete_Account, Show_all_Accounts, Exit, Enter = 13, ESC = 27};
@@ -83,7 +86,7 @@ int main(void){
        // Case to creat an account
        case Creat:
           people = (struct access *)realloc(people, (total_on+2) * sizeof(struct access)); // Reallocating memory
-          Creat_account(people, &total_on);       // j is the amount of people who have created an account
+          Creat_account(people, &total_on);       
           total_registered++;
           save_total_registered(total_registered);   // Save total users registered in a file
           break;
@@ -118,9 +121,9 @@ int main(void){
   return 0;
 }
 void Change_info(struct access people[], int *total_on, int *total_registered){
-  int code_changes, Option_changes, test_state_exist = 0;
+  int code_changes, Option_changes = 1, test_state_exist = 0;
   int auxMarital_status = 1, auxGender, i;
-  char auxMarriedWith[20];
+  char auxMarriedWith[20], KeyGoBackToMenu;
   char current_password[20];
   char key = ' ';
 
@@ -153,17 +156,183 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
   }
 
   do{
-    printf("\n ============= Changing information =================\n");
-    printf("\n What do you want to change? \n");
-    printf(" 1- Name\n 2- Password\n 3- City/State\n 4- Marital status\n 5- Birthday\n 6- Username\n 7- Exit\n --> ");
-    scanf("%d",&Option_changes);
+    key = ' ';
+    Option_changes = 1;
     system("cls");
 
+    printf("\n ============= Changing information =================\n");
+    printf("\n What do you want to change? \n");
+
+    gotoxy(2, 5);
+    printf(COLOR_RED" Name"COLOR_NONE);
+    gotoxy(2, 7);
+    printf(" Password");
+    gotoxy(2, 9);
+    printf(" City/State");
+    gotoxy(2, 11);
+    printf(" Marital status");
+    gotoxy(2, 13);
+    printf(" Birthday");
+    gotoxy(2, 15);
+    printf(" Username");
+    gotoxy(2, 17);
+    printf(" Exit");
+    gotoxy(2, 5);
+
+  while(key != Enter){
+        key = getch();
+        key = toupper(key);
+
+        if(key != Enter)key = getch();
+        key = toupper(key);
+
+        // If "up arrow" pressed (option minus one)
+        if(key == 'H'){
+            if(Option_changes > 1){
+                Option_changes--;
+            }
+        }
+        // If "down arrow" pressed (option plus one)
+        if (key == 'P'){
+            if(Option_changes < 7){
+                Option_changes++;
+            }
+        }
+
+        if(Option_changes == 1){
+            gotoxy(2, 5);
+            printf(COLOR_RED" Name"COLOR_NONE);
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 5);
+        }else if(Option_changes == 2){
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(COLOR_RED" Password"COLOR_NONE);
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 7);
+        }else if(Option_changes == 3){
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(COLOR_RED" City/State"COLOR_NONE);
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 9);
+        }else if(Option_changes == 4){
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(COLOR_RED" Marital status"COLOR_NONE);
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 11);
+        }else if(Option_changes == 5){
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(COLOR_RED" Birthday"COLOR_NONE);
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 13);
+        }else if(Option_changes == 6){
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(COLOR_RED" Username"COLOR_NONE);
+            gotoxy(2, 17);
+            printf(" Exit");
+            gotoxy(2, 15);
+        }else{
+            gotoxy(2, 5);
+            printf(" Name");
+            gotoxy(2, 7);
+            printf(" Password");
+            gotoxy(2, 9);
+            printf(" City/State");
+            gotoxy(2, 11);
+            printf(" Marital status");
+            gotoxy(2, 13);
+            printf(" Birthday");
+            gotoxy(2, 15);
+            printf(" Username");
+            gotoxy(2, 17);
+            printf(COLOR_RED" Exit"COLOR_NONE);
+            gotoxy(2, 17);
+        }
+    }
+
+    system("cls");
     switch(Option_changes){
        case 1:
-           printf("\n Enter your new name and surname: ");
+           printf(" Enter your new name and surname: ");
            scanf(" %[^\n]s",people[code_changes].name);
-           printf(" ### Your name has been successfully changed ###\n");
+           
+           printf(COLOR_RED"\n ### Your name has been successfully changed ###\n\n"COLOR_NONE);
+
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
+           system("cls");
            break;
        case 2:
            while(true){
@@ -176,7 +345,19 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
            }
            printf("\n\n Enter your new password: \n\n");
            gets_password(people[code_changes].password);
-           printf("\n\n\n ##### Your password has been successfully changed #####\n\n");
+           printf(COLOR_RED"\n\n\n ##### Your password has been successfully changed #####\n\n"COLOR_NONE);
+
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
+           system("cls");
            break;
        case 3:
            printf("\n Enter your new:\n");
@@ -194,8 +375,20 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
                    printf("\n -_- Brazil has no state with this name, please try gain.... -_-\n\a");
                }
            }
+           
+           printf(COLOR_RED"\n ### Your city/state has been successfully changed ###\n\n"COLOR_NONE);
+
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
            system("cls");
-           printf("\n ### Your city/state has been successfully changed ###\n\n");
            break;
         case 4:
             printf("\n Enter your new marital status: \n");
@@ -337,9 +530,18 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
               }else if(auxMarital_status == 6){
                   strcpy(people[code_changes].marital_status, "Dating");
               }
-           system("cls");
-           printf("\n\n ### Your marital status has been successfully changed ###\n\n");
-           getch();
+           
+           printf(COLOR_RED"\n\n ### Your marital status has been successfully changed ###\n\n"COLOR_NONE);
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
            system("cls");
            break;
         case 5:
@@ -371,12 +573,34 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
               else
                  printf("\n -_- There's no way you were born this year -_-\n\n\a");
            }
-           printf("\n\n ### Your birthday has been successfully changed ###\n\n");
+           printf(COLOR_RED"\n\n ### Your birthday has been successfully changed ###\n\n"COLOR_NONE);
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
+           system("cls");
            break;
         case 6:
            printf("\n Enter your new username: ");
            scanf(" %[^\n]s",people[code_changes].username);
-           printf("\n\n ### Your username has been successfully changed ###\n\n");
+           printf(COLOR_RED"\n\n ### Your username has been successfully changed ###\n\n"COLOR_NONE);
+           while(true){
+              printf("\n Press \"Esc\" to go back to Menu\n");
+              KeyGoBackToMenu = getch();
+              if(KeyGoBackToMenu == ESC){
+                  system("cls");
+                  break;
+              }else{
+                  printf("\n -_- Wrong key pressed, try again -_- \n\n");
+              }
+           }
+           system("cls");
            break;
         case 7:
            system("cls");
@@ -555,6 +779,18 @@ void deletes(struct access people[], int *total_on, int *total_registered){
     (*total_on)--;
     system("cls");
 }
+int compareByName(const void *compare1, const void *compare2){
+  struct access *x = (struct access *)compare1;
+  struct access *y = (struct access *)compare2;
+
+  return (stricmp(x->name, y-> name));
+}
+int compareByAge(const void *compare1, const void *compare2){
+  struct access *x = (struct access *)compare1;
+  struct access *y = (struct access *)compare2;
+
+  return ((x->Age > y->Age) ? 1 : -1);
+}
 void save_user(struct access people[], int *num_cod){
   FILE *arq;
   arq = fopen("UsersData.txt", "ab");
@@ -582,15 +818,65 @@ void saveALL(struct access people[], int *total_on){
   fclose(arq);
 }
 void showALL(struct access people[], int *total_on){
-  int test_state_exist = 0;
-  char KeyGoBackToMenu;
+  int test_state_exist = 0, auxSortby = 1;
+  char KeyGoBackToMenu, key = ' ';
   size_t i;
   system("cls");
   
   // if there's no one registered, it shows a message
   if(*total_on == 0){
-    printf("\n -_- There's nobody registered -_-\n");
+    printf(COLOR_RED"\n -_- There's nobody registered -_-\n\n"COLOR_NONE);
+  }else{
+    printf("\n Sort by: \n");
+
+    gotoxy(2, 3);
+    printf(COLOR_RED" Name"COLOR_NONE);
+    gotoxy(2, 4);
+    printf(" Age");
+    gotoxy(2, 3);
+
+    while(key != Enter){
+        key = getch();
+        key = toupper(key);
+        
+        if(key != Enter)key = getch();
+        key = toupper(key);
+
+        // If "up arrow" pressed (option minus one)
+        if(key == 'H'){
+            if(auxSortby > 1){
+                auxSortby--;
+            }
+        }
+        // If "down arrow" pressed (option plus one)
+        if (key == 'P'){
+            if(auxSortby < 2){
+                auxSortby++;
+            }
+        }
+        if(auxSortby == 1){
+          gotoxy(2, 3);
+          printf(COLOR_RED" Name"COLOR_NONE);
+          gotoxy(2, 4);
+          printf(" Age");
+          gotoxy(2, 3);
+        }else{
+          gotoxy(2, 3);
+          printf(" Name");
+          gotoxy(2, 4);
+          printf(COLOR_RED" Age"COLOR_NONE);
+          gotoxy(2, 4);
+        }
+    }
+ 
+    system("cls");
+    if(auxSortby == 1){
+      qsort(people, *total_on, sizeof(struct access), compareByName);
+    }else{
+      qsort(people, *total_on, sizeof(struct access), compareByAge);
+    }
   }
+
   for(i = 0; i < *total_on; i++){
     printf("\n| Username: %s (%s) \n",people[i].name,people[i].username);
     printf("| Age: %i", 2018-people[i].birthday.year);
@@ -600,7 +886,7 @@ void showALL(struct access people[], int *total_on){
     state_abbreviation(people[i].state,&test_state_exist); // Calling the function to get the abbreviation
     printf("\n| Gender: %s\n\n", people[i].gender);
   }
-  printf("\n");
+  
   while(true){
        printf(" Press \"Esc\" to go back to Menu\n");
        KeyGoBackToMenu = getch();
@@ -651,7 +937,8 @@ void Creat_account(struct access people[], int *j){
         if(strcmp(people[*j].password,people[*j].confirm_password) == 0){
           break;
         }else{
-          printf("\n\n -_- The passwords don't match. Please re-enter a password again -_-\n\n\a");
+          system("cls");
+          printf(COLOR_RED"\n\n -_- The passwords don't match. Please re-enter a password again -_-\n\n\a"COLOR_NONE);
         }
      }
      system("cls");
@@ -897,6 +1184,9 @@ void Creat_account(struct access people[], int *j){
       else
         printf("\n -_- *There's no way you were born this year. -_-\n\n\a");
     }
+    // Gets the user's age
+    people[*j].Age = 2018 - (people[*j].birthday.year);
+
     system("cls");
     printf("\n ---------------------------------------------------------------------------------------------------------------- ");
     printf("\n #Your account has been successfully created!\n\n");
@@ -1199,6 +1489,7 @@ int Menu(void){
 
   return option;
 }
+
 
 
 
