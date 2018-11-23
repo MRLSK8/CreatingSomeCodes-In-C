@@ -122,7 +122,7 @@ int main(void){
 }
 void Change_info(struct access people[], int *total_on, int *total_registered){
   int code_changes, Option_changes = 1, test_state_exist = 0;
-  int auxMarital_status = 1, auxGender, i;
+  int auxMarital_status = 1, auxGender, i, auxCount;
   char auxMarriedWith[20], KeyGoBackToMenu;
   char current_password[20];
   char key = ' ';
@@ -587,8 +587,25 @@ void Change_info(struct access people[], int *total_on, int *total_registered){
            system("cls");
            break;
         case 6:
-           printf("\n Enter your new username: ");
-           scanf(" %[^\n]s",people[code_changes].username);
+          while(true){
+            printf("\n Enter your new username: ");
+            scanf(" %[^\n]s",people[code_changes].username);
+
+            auxCount = 0;
+            //Checking if the username already exists
+            for(i = 0; i < *total_on, i != code_changes; i++){
+              printf("\n teste\n");
+              if(stricmp(people[code_changes].username, people[i].username) == 0){
+                auxCount++;
+                break;
+              }
+            }
+            if(auxCount != 0){
+                printf("\n -_- This username already exist, try a different one... -_-\n\n\a");
+            }else
+                break;
+          }
+
            printf(COLOR_RED"\n\n ### Your username has been successfully changed ###\n\n"COLOR_NONE);
            while(true){
               printf("\n Press \"Esc\" to go back to Menu\n");
@@ -923,7 +940,7 @@ void Creat_account(struct access people[], int *j){
          }
        }
        if(p != 0){
-          printf("\n -_- *This username already exist, try a different one... -_-\n\n\a");
+          printf("\n -_- This username already exist, try a different one... -_-\n\n\a");
        }else
           break;
      }
