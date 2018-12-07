@@ -333,7 +333,7 @@ void Change_info(struct access people[], int *total_on){
        case 1:
            printf(" Enter your new name and surname: ");
            scanf(" %[^\n]s",people[code_changes].name);
-           
+           system("cls");
            printf(COLOR_RED"\n ### Your name has been successfully changed ###\n\n"COLOR_NONE);
 
            while(true){
@@ -408,6 +408,8 @@ void Change_info(struct access people[], int *total_on){
            break;
         case 4:
             printf("\n Enter your new marital status: \n");
+            key = ' ';
+            auxMarital_status = 1;
 
             gotoxy(2, 3);
             printf(COLOR_RED" Single "COLOR_NONE);
@@ -590,6 +592,7 @@ void Change_info(struct access people[], int *total_on){
               }else
                  printf("\n -_- There's no way you were born this year -_-\n\n\a");
            }
+           system("cls");
            printf(COLOR_RED"\n\n ### Your birthday has been successfully changed ###\n\n"COLOR_NONE);
            while(true){
               printf("\n Press \"Esc\" to go back to Menu\n");
@@ -621,7 +624,7 @@ void Change_info(struct access people[], int *total_on){
             }else
                 break;
           }
-
+           system("cls");
            printf(COLOR_RED"\n\n ### Your username has been successfully changed ###\n\n"COLOR_NONE);
            while(true){
               printf("\n Press \"Esc\" to go back to Menu\n");
