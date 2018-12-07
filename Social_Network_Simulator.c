@@ -25,6 +25,8 @@ struct access{
 };
 
 // Function prototypes
+int Binary_search(struct access people[], int left, int right, char name[]);
+int compareByUsername(const void *compare1, const void *compare2);
 int compareByName(const void *compare1, const void *compare2);
 int compareByAge(const void *compare1, const void *compare2);
 void Change_info(struct access people[], int *total_on);
@@ -39,7 +41,6 @@ void gets_password(char password[]);
 void gotoxy(int x, int y);
 void Loading(void);
 int Menu(void);
-
 // Enumeration
 enum{Creat = 1, LogInto, Change_Info, Delete_Account, Show_all_Accounts, Exit, Enter = 13, ESC = 27};
 
@@ -67,6 +68,7 @@ int main(void){
   }
   fclose(arq1);  // Close the file
 
+  system("cls");
   do{
     option = Menu();
 
@@ -106,11 +108,34 @@ int main(void){
   Sleep(3000);
   return 0;
 }
+int Binary_search(struct access people[], int left, int right, char name[]){
+  qsort(people, right, sizeof(struct access), compareByUsername);
+
+  while(left <= right){
+    // Middle of the array
+    int middle = (left + right) / 2;
+
+    if(stricmp(people[middle].username, name) < 0){
+      left = middle + 1;
+    }else if(stricmp(people[middle].username, name) > 0){
+      right = middle - 1;
+    }else if(stricmp(people[middle].username, name) == 0){
+      return middle;  // if it's found, it returns the position where it is in the array
+    }
+  }
+  return -1;  // in case of the number was not found, it returns -1 
+}
+int compareByUsername(const void *compare1, const void *compare2){
+  struct access *x = (struct access *)compare1;
+  struct access *y = (struct access *)compare2;
+
+  return (stricmp(x->username, y-> username));
+}
 int compareByName(const void *compare1, const void *compare2){
   struct access *x = (struct access *)compare1;
   struct access *y = (struct access *)compare2;
 
-  return (stricmp(x->name, y-> name));
+  return (stricmp(x->name, y->name));
 }
 int compareByAge(const void *compare1, const void *compare2){
   struct access *x = (struct access *)compare1;
@@ -118,13 +143,335 @@ int compareByAge(const void *compare1, const void *compare2){
 
   return ((x->Age > y->Age) ? 1 : -1);
 }
+void Creat_account(struct access people[], int *total_on){
+   int auxGender = 1, auxMaritual_status = 1;
+   int i, p, test_state_exist = 0;
+   char KeyGoBackToMenu = ' ';
+   char auxMarriedWith[30];
+   char key = ' ';
+
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n Enter your name and surname: ");
+    scanf(" %[^\n]s",people[*total_on].name);
+
+    // Getting the username
+    while(true){
+       printf(" Enter your username: ");
+       scanf(" %[^\n]s",people[*total_on].username);
+       p = 0;
+       //Checking if the username already exists
+       for(i = 0; i < *total_on; i++){
+         if(strcmp(people[*total_on].username,people[i].username) == 0){
+           p++;
+           break;
+         }
+       }
+       if(p != 0){
+          printf("\n -_- This username already exist, try a different one... -_-\n\n\a");
+       }else
+          break;
+     }
+     system("cls");
+     printf("\n ***** Creating an account *****\n\n");
+     while(true){
+        printf(COLOR_RED" #Creat a password: \n\n"COLOR_NONE);
+        gets_password(people[*total_on].password); // Function to get the password.
+        printf(COLOR_RED"\n\n #Confirm your password: \n\n"COLOR_NONE);
+        gets_password(people[*total_on].confirm_password); // Function to get the password(confirmation).
+        if(strcmp(people[*total_on].password,people[*total_on].confirm_password) == 0){
+          break;
+        }else{
+          system("cls");
+          printf(COLOR_RED"\n\n -_- The passwords don't match. Please re-enter a password again -_-\n\n\a"COLOR_NONE);
+        }
+     }
+     system("cls");
+     printf("\n ***** Creating an account *****\n\n");
+     printf("  Gender: \n");
+
+     gotoxy(2, 5);
+     printf(COLOR_RED" Female "COLOR_NONE);
+     gotoxy(2, 6);
+     printf(" Male ");
+     gotoxy(2, 5);
+
+     while(key != Enter){
+        key = getch();
+        key = toupper(key);
+        
+        if(key != Enter)key = getch();
+        key = toupper(key);
+
+        // If "up arrow" pressed (option minus one)
+        if(key == 'H'){
+            if(auxGender > 1){
+                auxGender--;
+            }
+        }
+        // If "down arrow" pressed (option plus one)
+        if (key == 'P'){
+            if(auxGender < 2){
+                auxGender++;
+            }
+        }
+        if(auxGender == 1){
+          gotoxy(2, 5);
+          printf(COLOR_RED" Female "COLOR_NONE);
+          gotoxy(2, 6);
+          printf(" Male ");
+          gotoxy(2, 5);
+        }else{
+          gotoxy(2, 5);
+          printf(" Female ");
+          gotoxy(2, 6);
+          printf(COLOR_RED" Male "COLOR_NONE);
+          gotoxy(2, 6);
+        }
+     }
+
+     // Saving the gender in the variable as string
+     if(auxGender == 1){
+        strcpy(people[*total_on].gender, "Female");
+     }else{
+        strcpy(people[*total_on].gender, "Male");
+     }
+
+    system("cls");
+    key = ' ';
+    printf("\n ***** Creating an account *****\n\n");
+    printf(" Marital status: \n");
+    
+  gotoxy(2, 5);
+  printf(COLOR_RED" Single "COLOR_NONE);
+  gotoxy(2, 7);
+  printf(" Married");
+  gotoxy(2, 9);
+  printf(" Separated");
+  gotoxy(2, 11);
+  printf(" Divorced");
+  gotoxy(2, 13);
+  printf(" Widowed");
+  gotoxy(2, 15);
+  printf(" Dating");
+  gotoxy(2, 5);
+
+  while(key != Enter){
+      key = getch();
+      key = toupper(key);
+
+      if(key != Enter)key = getch();
+      key = toupper(key);
+
+      // If "up arrow" pressed (option minus one)
+      if(key == 'H'){
+          if(auxMaritual_status > 1){
+              auxMaritual_status--;
+          }
+      }
+      // If "down arrow" pressed (option plus one)
+      if (key == 'P'){
+          if(auxMaritual_status < 6){
+              auxMaritual_status++;
+          }
+      }
+
+      if(auxMaritual_status == 1){
+          gotoxy(2, 5);
+          printf(COLOR_RED" Single "COLOR_NONE);
+          gotoxy(2, 7);
+          printf(" Married");
+          gotoxy(2, 9);
+          printf(" Separated");
+          gotoxy(2, 11);
+          printf(" Divorced");
+          gotoxy(2, 13);
+          printf(" Widowed");
+          gotoxy(2, 15);
+          printf(" Dating");
+          gotoxy(2, 5);
+      }else if(auxMaritual_status == 2){
+          gotoxy(2, 5);
+          printf(" Single ");
+          gotoxy(2, 7);
+          printf(COLOR_RED" Married"COLOR_NONE);
+          gotoxy(2, 9);
+          printf(" Separated");
+          gotoxy(2, 11);
+          printf(" Divorced");
+          gotoxy(2, 13);
+          printf(" Widowed");
+          gotoxy(2, 15);
+          printf(" Dating");
+          gotoxy(2, 7);
+      }else if(auxMaritual_status == 3){
+          gotoxy(2, 5);
+          printf(" Single ");
+          gotoxy(2, 7);
+          printf(" Married");
+          gotoxy(2, 9);
+          printf(COLOR_RED" Separated"COLOR_NONE);
+          gotoxy(2, 11);
+          printf(" Divorced");
+          gotoxy(2, 13);
+          printf(" Widowed");
+          gotoxy(2, 15);
+          printf(" Dating");
+          gotoxy(2, 9);
+      }else if(auxMaritual_status == 4){
+          gotoxy(2, 5);
+          printf(" Single ");
+          gotoxy(2, 7);
+          printf(" Married");
+          gotoxy(2, 9);
+          printf(" Separated");
+          gotoxy(2, 11);
+          printf(COLOR_RED" Divorced"COLOR_NONE);
+          gotoxy(2, 13);
+          printf(" Widowed");
+          gotoxy(2, 15);
+          printf(" Dating");
+          gotoxy(2, 11);
+      }else if(auxMaritual_status == 5){
+          gotoxy(2, 5);
+          printf(" Single ");
+          gotoxy(2, 7);
+          printf(" Married");
+          gotoxy(2, 9);
+          printf(" Separated");
+          gotoxy(2, 11);
+          printf(" Divorced");
+          gotoxy(2, 13);
+          printf(COLOR_RED" Widowed"COLOR_NONE);
+          gotoxy(2, 15);
+          printf(" Dating");
+          gotoxy(2, 13);
+      }else{
+          gotoxy(2, 5);
+          printf(" Single ");
+          gotoxy(2, 7);
+          printf(" Married");
+          gotoxy(2, 9);
+          printf(" Separated");
+          gotoxy(2, 11);
+          printf(" Divorced");
+          gotoxy(2, 13);
+          printf(" Widowed");
+          gotoxy(2, 15);
+          printf(COLOR_RED" Dating"COLOR_NONE);
+          gotoxy(2, 15);
+      }
+    }
+    
+    system("cls");
+    // Saving the relationship status in the variable as string
+    if(auxMaritual_status == 1){
+        strcpy(people[*total_on].marital_status, "Single");
+    }else if(auxMaritual_status == 2){
+        printf("\n Married to: ");
+        scanf(" %[^\n]s",auxMarriedWith);
+        strcpy(people[*total_on].marital_status, "Married to ");
+        strcat(people[*total_on].marital_status, auxMarriedWith);
+    }else if(auxMaritual_status == 3){
+        strcpy(people[*total_on].marital_status, "Separated");
+    }else if(auxMaritual_status == 4){
+        strcpy(people[*total_on].marital_status, "Divorced");
+    }else if(auxMaritual_status == 5){
+        strcpy(people[*total_on].marital_status, "Widowed");
+    }else if(auxMaritual_status == 6){
+        strcpy(people[*total_on].marital_status, "Dating");
+    }
+
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n Living in:");
+    printf("\n City: ");
+    scanf(" %[^\n]s",people[*total_on].city);
+    while(true){
+      test_state_exist = 0;
+      printf(" State: ");
+      scanf(" %[^\n]s",people[*total_on].state);
+      state_abbreviation(people[*total_on].state, &test_state_exist);
+      if(test_state_exist == 0)
+        break;
+      else{
+        printf(" *Not found*");
+        printf("\n -_- Brazil has no state with this name, please try gain.... -_-\n\a");
+      }
+    }
+    system("cls");
+    printf("\n ***** Creating an account *****\n\n");
+    printf("\n\n Birthday: \n");
+    while(true){
+      fflush(stdin);
+      printf(" Day: ");
+      scanf(" %d",&people[*total_on].birthday.day);
+      if(people[*total_on].birthday.day > 0 && people[*total_on].birthday.day <= 31)
+       break;
+      else
+       printf("\n -_- The day you entered is incorrect. -_-\n\n\a");
+    }
+    while(true){
+      fflush(stdin);
+      printf(" Month: ");
+      scanf(" %d",&people[*total_on].birthday.month);
+      if(people[*total_on].birthday.month > 0 && people[*total_on].birthday.month <= 12)
+        break;
+      else
+        printf("\n -_- The month you entered is incorrect. -_-\n\n\a");
+    }
+    while(true){
+      fflush(stdin);
+      printf(" year: ");
+      scanf(" %d",&people[*total_on].birthday.year);
+      if(people[*total_on].birthday.year > 1900 && people[*total_on].birthday.year <= 2018)
+        break;
+      else
+        printf("\n -_- There's no way you were born this year. -_-\n\n\a");
+    }
+    // Gets the user's age
+    people[*total_on].Age = 2018 - (people[*total_on].birthday.year);
+
+    system("cls");
+    printf("\n -------------------------------------------------------------------------------------------- ");
+    printf("\n #Your account has been successfully created!\n\n");
+    printf(" #Your security code: ---> ");
+    for(i = 0; i < 3; i++){
+     people[*total_on].security_code[i] = rand() % 10;
+    }
+    printf(COLOR_RED);
+    for(i = 0; i < 3; i++){
+      if(i != 2){
+        printf("%d, ",people[*total_on].security_code[i]);
+      }else
+        printf("%d",people[*total_on].security_code[i]);
+    }
+    printf(COLOR_NONE);
+    printf(" <--- \n \"In case you forget your password, you'll need this code in order to change it\"\n");
+    printf("\n --------------------------------------------------------------------------------------------\n\n\n");
+
+    // Saving user's info
+    save_user(people, total_on);  // Here "j" is equal to "&j"
+
+    (*total_on)++; 
+
+    while(true){
+       printf(" Press \"Esc\" to go back to Menu\n");
+       KeyGoBackToMenu = getch();
+       if(KeyGoBackToMenu == ESC){
+         system("cls");
+         break;
+       }else{
+         printf("\n -_- Wrong key pressed, try again -_- \n\n");
+       }
+    }
+}
 void Change_info(struct access people[], int *total_on){
   int code_changes, Option_changes = 1, test_state_exist = 0;
   char current_password[20], change_username[30], change_password[30];;
   int auxMarital_status = 1, auxGender, i, auxCount;
   char auxMarriedWith[20], KeyGoBackToMenu;
   char key = ' ';
-  bool exist = false;
 
   system("cls");
   
@@ -139,28 +486,24 @@ void Change_info(struct access people[], int *total_on){
       system("cls");
       return;
     }
-    exist = false;
-    for(i = 0; i < *total_on; i++){
-      if(stricmp(change_username, people[i].username) == 0){
-        exist = true;
-        code_changes = i;
-        break;
-      }
+    if(*total_on == 0){
+      printf("\n -_- This username doesn't exist!!! -_-\n\n\a");
+      continue;
     }
-    if(exist){
+    code_changes = Binary_search(people, 0, (*total_on) - 1, change_username);
+  
+    if(code_changes != -1){
       break;
     }else{
       printf("\n -_- This username doesn't exist!!! -_-\n\n\a");
     }
   }
-
-  exist = false;
   printf(COLOR_RED"\n\n >> Enter \"return\" to go back to Menu <<\n\n"COLOR_NONE);
   while(true){
     printf("\n Enter your password: \n");
     gets_password(change_password);
     if(stricmp(change_password, "return") == 0)break;
-
+    
     if(stricmp(people[code_changes].password, change_password) == 0){
       system("cls");
       break;
@@ -922,329 +1265,6 @@ void showALL(struct access people[], int *total_on){
        }
   }
 }
-void Creat_account(struct access people[], int *j){
-   int auxGender = 1, auxMaritual_status = 1;
-   int i, p, test_state_exist = 0;
-   char KeyGoBackToMenu = ' ';
-   char auxMarriedWith[30];
-   char key = ' ';
-
-    system("cls");
-    printf("\n ***** Creating an account *****\n\n");
-    printf("\n Enter your name and surname: ");
-    scanf(" %[^\n]s",people[*j].name);
-
-    // Getting the username
-    while(true){
-       printf(" Enter your username: ");
-       scanf(" %[^\n]s",people[*j].username);
-       p = 0;
-       //Checking if the username already exists
-       for(i = 0; i < *j; i++){
-         if(strcmp(people[*j].username,people[i].username) == 0){
-           p++;
-           break;
-         }
-       }
-       if(p != 0){
-          printf("\n -_- This username already exist, try a different one... -_-\n\n\a");
-       }else
-          break;
-     }
-     system("cls");
-     printf("\n ***** Creating an account *****\n\n");
-     while(true){
-        printf(COLOR_RED" #Creat a password: \n\n"COLOR_NONE);
-        gets_password(people[*j].password); // Function to get the password.
-        printf(COLOR_RED"\n\n #Confirm your password: \n\n"COLOR_NONE);
-        gets_password(people[*j].confirm_password); // Function to get the password(confirmation).
-        if(strcmp(people[*j].password,people[*j].confirm_password) == 0){
-          break;
-        }else{
-          system("cls");
-          printf(COLOR_RED"\n\n -_- The passwords don't match. Please re-enter a password again -_-\n\n\a"COLOR_NONE);
-        }
-     }
-     system("cls");
-     printf("\n ***** Creating an account *****\n\n");
-     printf("  Gender: \n");
-
-     gotoxy(2, 5);
-     printf(COLOR_RED" Female "COLOR_NONE);
-     gotoxy(2, 6);
-     printf(" Male ");
-     gotoxy(2, 5);
-
-     while(key != Enter){
-        key = getch();
-        key = toupper(key);
-        
-        if(key != Enter)key = getch();
-        key = toupper(key);
-
-        // If "up arrow" pressed (option minus one)
-        if(key == 'H'){
-            if(auxGender > 1){
-                auxGender--;
-            }
-        }
-        // If "down arrow" pressed (option plus one)
-        if (key == 'P'){
-            if(auxGender < 2){
-                auxGender++;
-            }
-        }
-        if(auxGender == 1){
-          gotoxy(2, 5);
-          printf(COLOR_RED" Female "COLOR_NONE);
-          gotoxy(2, 6);
-          printf(" Male ");
-          gotoxy(2, 5);
-        }else{
-          gotoxy(2, 5);
-          printf(" Female ");
-          gotoxy(2, 6);
-          printf(COLOR_RED" Male "COLOR_NONE);
-          gotoxy(2, 6);
-        }
-     }
-
-     // Saving the gender in the variable as string
-     if(auxGender == 1){
-        strcpy(people[*j].gender, "Female");
-     }else{
-        strcpy(people[*j].gender, "Male");
-     }
-
-    system("cls");
-    key = ' ';
-    printf("\n ***** Creating an account *****\n\n");
-    printf(" Marital status: \n");
-    
-  gotoxy(2, 5);
-  printf(COLOR_RED" Single "COLOR_NONE);
-  gotoxy(2, 7);
-  printf(" Married");
-  gotoxy(2, 9);
-  printf(" Separated");
-  gotoxy(2, 11);
-  printf(" Divorced");
-  gotoxy(2, 13);
-  printf(" Widowed");
-  gotoxy(2, 15);
-  printf(" Dating");
-  gotoxy(2, 5);
-
-  while(key != Enter){
-      key = getch();
-      key = toupper(key);
-
-      if(key != Enter)key = getch();
-      key = toupper(key);
-
-      // If "up arrow" pressed (option minus one)
-      if(key == 'H'){
-          if(auxMaritual_status > 1){
-              auxMaritual_status--;
-          }
-      }
-      // If "down arrow" pressed (option plus one)
-      if (key == 'P'){
-          if(auxMaritual_status < 6){
-              auxMaritual_status++;
-          }
-      }
-
-      if(auxMaritual_status == 1){
-          gotoxy(2, 5);
-          printf(COLOR_RED" Single "COLOR_NONE);
-          gotoxy(2, 7);
-          printf(" Married");
-          gotoxy(2, 9);
-          printf(" Separated");
-          gotoxy(2, 11);
-          printf(" Divorced");
-          gotoxy(2, 13);
-          printf(" Widowed");
-          gotoxy(2, 15);
-          printf(" Dating");
-          gotoxy(2, 5);
-      }else if(auxMaritual_status == 2){
-          gotoxy(2, 5);
-          printf(" Single ");
-          gotoxy(2, 7);
-          printf(COLOR_RED" Married"COLOR_NONE);
-          gotoxy(2, 9);
-          printf(" Separated");
-          gotoxy(2, 11);
-          printf(" Divorced");
-          gotoxy(2, 13);
-          printf(" Widowed");
-          gotoxy(2, 15);
-          printf(" Dating");
-          gotoxy(2, 7);
-      }else if(auxMaritual_status == 3){
-          gotoxy(2, 5);
-          printf(" Single ");
-          gotoxy(2, 7);
-          printf(" Married");
-          gotoxy(2, 9);
-          printf(COLOR_RED" Separated"COLOR_NONE);
-          gotoxy(2, 11);
-          printf(" Divorced");
-          gotoxy(2, 13);
-          printf(" Widowed");
-          gotoxy(2, 15);
-          printf(" Dating");
-          gotoxy(2, 9);
-      }else if(auxMaritual_status == 4){
-          gotoxy(2, 5);
-          printf(" Single ");
-          gotoxy(2, 7);
-          printf(" Married");
-          gotoxy(2, 9);
-          printf(" Separated");
-          gotoxy(2, 11);
-          printf(COLOR_RED" Divorced"COLOR_NONE);
-          gotoxy(2, 13);
-          printf(" Widowed");
-          gotoxy(2, 15);
-          printf(" Dating");
-          gotoxy(2, 11);
-      }else if(auxMaritual_status == 5){
-          gotoxy(2, 5);
-          printf(" Single ");
-          gotoxy(2, 7);
-          printf(" Married");
-          gotoxy(2, 9);
-          printf(" Separated");
-          gotoxy(2, 11);
-          printf(" Divorced");
-          gotoxy(2, 13);
-          printf(COLOR_RED" Widowed"COLOR_NONE);
-          gotoxy(2, 15);
-          printf(" Dating");
-          gotoxy(2, 13);
-      }else{
-          gotoxy(2, 5);
-          printf(" Single ");
-          gotoxy(2, 7);
-          printf(" Married");
-          gotoxy(2, 9);
-          printf(" Separated");
-          gotoxy(2, 11);
-          printf(" Divorced");
-          gotoxy(2, 13);
-          printf(" Widowed");
-          gotoxy(2, 15);
-          printf(COLOR_RED" Dating"COLOR_NONE);
-          gotoxy(2, 15);
-      }
-    }
-    
-    system("cls");
-    // Saving the relationship status in the variable as string
-    if(auxMaritual_status == 1){
-        strcpy(people[*j].marital_status, "Single");
-    }else if(auxMaritual_status == 2){
-        printf("\n Married to: ");
-        scanf(" %[^\n]s",auxMarriedWith);
-        strcpy(people[*j].marital_status, "Married to ");
-        strcat(people[*j].marital_status, auxMarriedWith);
-    }else if(auxMaritual_status == 3){
-        strcpy(people[*j].marital_status, "Separated");
-    }else if(auxMaritual_status == 4){
-        strcpy(people[*j].marital_status, "Divorced");
-    }else if(auxMaritual_status == 5){
-        strcpy(people[*j].marital_status, "Widowed");
-    }else if(auxMaritual_status == 6){
-        strcpy(people[*j].marital_status, "Dating");
-    }
-
-    system("cls");
-    printf("\n ***** Creating an account *****\n\n");
-    printf("\n Living in:");
-    printf("\n City: ");
-    scanf(" %[^\n]s",people[*j].city);
-    while(true){
-      test_state_exist = 0;
-      printf(" State: ");
-      scanf(" %[^\n]s",people[*j].state);
-      state_abbreviation(people[*j].state, &test_state_exist);
-      if(test_state_exist == 0)
-        break;
-      else{
-        printf(" *Not found*");
-        printf("\n -_- Brazil has no state with this name, please try gain.... -_-\n\a");
-      }
-    }
-    system("cls");
-    printf("\n ***** Creating an account *****\n\n");
-    printf("\n\n Birthday: \n");
-    while(true){
-      fflush(stdin);
-      printf(" Day: ");
-      scanf(" %d",&people[*j].birthday.day);
-      if(people[*j].birthday.day > 0 && people[*j].birthday.day <= 31)
-       break;
-      else
-       printf("\n -_- The day you entered is incorrect. -_-\n\n\a");
-    }
-    while(true){
-      fflush(stdin);
-      printf(" Month: ");
-      scanf(" %d",&people[*j].birthday.month);
-      if(people[*j].birthday.month > 0 && people[*j].birthday.month <= 12)
-        break;
-      else
-        printf("\n -_- The month you entered is incorrect. -_-\n\n\a");
-    }
-    while(true){
-      fflush(stdin);
-      printf(" year: ");
-      scanf(" %d",&people[*j].birthday.year);
-      if(people[*j].birthday.year > 1900 && people[*j].birthday.year <= 2018)
-        break;
-      else
-        printf("\n -_- There's no way you were born this year. -_-\n\n\a");
-    }
-    // Gets the user's age
-    people[*j].Age = 2018 - (people[*j].birthday.year);
-
-    system("cls");
-    printf("\n -------------------------------------------------------------------------------------------- ");
-    printf("\n #Your account has been successfully created!\n\n");
-    printf(" #Your security code: ---> ");
-    for(i = 0; i < 3; i++){
-     people[*j].security_code[i] = rand() % 10;
-    }
-    printf(COLOR_RED);
-    for(i = 0; i < 3; i++){
-      if(i != 2){
-        printf("%d, ",people[*j].security_code[i]);
-      }else
-        printf("%d",people[*j].security_code[i]);
-    }
-    printf(COLOR_NONE);
-    printf(" <--- \n \"In case you forget your password, you'll need this code in order to change it\"\n");
-    printf("\n --------------------------------------------------------------------------------------------\n\n\n");
-
-    // Saving user's info
-    save_user(people, j);  // Here "j" is equal to "&j"
-
-    (*j)++; 
-
-    while(true){
-       printf(" Press \"Esc\" to go back to Menu\n");
-       KeyGoBackToMenu = getch();
-       if(KeyGoBackToMenu == ESC){
-         system("cls");
-         break;
-       }else{
-         printf("\n -_- Wrong key pressed, try again -_- \n\n");
-       }
-    }
-}
 void state_abbreviation(char x[],int *z){
  char abbreviation[5];
 
@@ -1498,6 +1518,7 @@ int Menu(void){
 
   return option;
 }
+
 
 
 
