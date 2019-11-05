@@ -21,7 +21,10 @@ int main(void) {
    return 0;
 }
 int Binary_search(int array[], int left, int right, int value){
-  
+   
+   if(array[left] > value || array[right] < value){
+       return -1;
+   }
    while(left <= right){
        // Middle of the array
        int middle = (left + right) / 2;
