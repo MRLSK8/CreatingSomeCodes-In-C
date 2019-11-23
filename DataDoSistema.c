@@ -4,7 +4,7 @@
 #include <string.h>
 
 int main(void){
-    char Data[10];
+    char Data[15];
 
     // Variavel do tipo "time_t" que guarda datas.
     time_t now;
@@ -25,10 +25,10 @@ int main(void){
     ctime(&now);
 
     // localtime recebe o parametro de uma variavel do tipo time_t, 
-    // e retorna uma struct com atributos (tm_hour, tm_min, tm, tm_sec, tm_mday, tm_mon, tm_year)
+    // e retorna uma struct com atributos (tm_hour, tm_min, tm_hour, tm_sec, tm_mday, tm_mon, tm_year etc.)
     struct tm *localDate = localtime(&now);
 
-    // Mostra a data já formatada, mas com os valores saparados em variveis do tipo "int"
+    // Mostra a data, mas com os valores saparados em variveis do tipo "int"
     // "localDate->tm_year + 1900" pq essa varivel guarda a quantidade de anos desde 1900, então se somar com 1900 temos a data atual
     //  "localDate->tm_mon" retorna o numero do mês entre 0 e 11,  por isso o + 1
     printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon + 1, localDate->tm_year + 1900);
