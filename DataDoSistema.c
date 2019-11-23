@@ -34,7 +34,7 @@ int main(void){
     printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon + 1, localDate->tm_year + 1900);
 
     // Copia o data já formatada para a várivel "Data"
-    sprintf(Data, "%d/%d/%d.txt", localDate->tm_mday, localDate->tm_mon, localDate->tm_year + 1900);
+    sprintf(Data, "%d/%d/%d.txt", localDate->tm_mday, localDate->tm_mon + 1, localDate->tm_year + 1900);
 
     // Mostra a data já na variavel "Data"
     printf("\n Data: %s\n\n", Data);
