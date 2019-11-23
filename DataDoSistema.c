@@ -4,7 +4,7 @@
 #include <string.h>
 
 int main(void){
-    char Data[10];
+    char Data[15];
 
     // Variavel do tipo "time_t" que guarda datas.
     time_t now;
