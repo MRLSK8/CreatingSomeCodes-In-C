@@ -30,7 +30,8 @@ int main(void){
 
     // Mostra a data já formatada, mas com os valores saparados em variveis do tipo "int"
     // "localDate->tm_year + 1900" pq essa varivel guarda a quantidade de anos desde 1900, então se somar com 1900 temos a data atual
-    printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon, localDate->tm_year + 1900);
+    //  "localDate->tm_mon" retorna o numero do mês entre 0 e 11,  por isso o + 1
+    printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon + 1, localDate->tm_year + 1900);
 
     // Copia o data já formatada para a várivel "Data"
     sprintf(Data, "%d/%d/%d.txt", localDate->tm_mday, localDate->tm_mon, localDate->tm_year + 1900);
