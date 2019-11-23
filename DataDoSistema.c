@@ -25,7 +25,7 @@ int main(void){
     ctime(&now);
 
     // localtime recebe o parametro de uma variavel do tipo time_t, 
-    // e retorna uma struct com atributos (tm_hour, tm_min, tm, tm_sec, tm_mday, tm_mon, tm_year)
+    // e retorna uma struct com atributos (tm_hour, tm_min, tm_hour, tm_sec, tm_mday, tm_mon, tm_year etc.)
     struct tm *localDate = localtime(&now);
 
     // Mostra a data, mas com os valores saparados em variveis do tipo "int"
