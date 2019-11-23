@@ -28,14 +28,15 @@ int main(void){
     // e retorna uma struct com atributos (tm_hour, tm_min, tm, tm_sec, tm_mday, tm_mon, tm_year)
     struct tm *localDate = localtime(&now);
 
-    // Mostra a data já, mas com os valores saparados em variveis do tipo "int"
-    //printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon, localDate->tm_year);
+    // Mostra a data já formatada, mas com os valores saparados em variveis do tipo "int"
+    // "localDate->tm_year + 1900" pq essa varivel guarda a quantidade de anos desde 1900, então se somar com 1900 temos a data atual
+    printf("\n\n Data: %d/%d/%d\n", localDate->tm_mday, localDate->tm_mon, localDate->tm_year + 1900);
 
     // Copia o data já formatada para a várivel "Data"
-    sprintf(Data, "%d/%d/%d", localDate->tm_mday, localDate->tm_mon, localDate->tm_year);
+    sprintf(Data, "%d/%d/%d.txt", localDate->tm_mday, localDate->tm_mon, localDate->tm_year + 1900);
 
     // Mostra a data já na variavel "Data"
-    // printf("\n Data: %s\n\n", Data);
+    printf("\n Data: %s\n\n", Data);
 
     return 0;
 }
